@@ -43,7 +43,7 @@ class Program
             Console.SetCursorPosition(0, y);
             print(new string(' ', Console.WindowWidth - 1));   // ← Width, не Height!
         }
-        last_y_pos = 0;
+
     }
     static void sleep(int seconds) {Thread.Sleep(seconds);}
     void get_folder(string path,int mode){
@@ -67,7 +67,7 @@ class Program
     static void Main(string[] args)
     {
         Program app = new Program();
-
+        Console.SetWindowSize(200,60);
         Console.CursorVisible = false;
         while (true)
         {
@@ -131,12 +131,12 @@ class Program
                     app.update();
                 }
                 else
-                    if (key.Key == ConsoleKey.UpArrow && app.sellect > 0)
+                    if (app.files != null && key.Key == ConsoleKey.UpArrow && app.sellect > 0)
                 {
                     app.sellect--;
                 }
                 else
-                    if (key.Key == ConsoleKey.DownArrow && app.sellect < (app.files.Length-1))
+                    if (app.files!=null && key.Key == ConsoleKey.DownArrow && app.sellect < (app.files.Length-1))
                     app.sellect++;
             }
             if (!string.IsNullOrEmpty(app.sobraniy))
@@ -147,7 +147,7 @@ class Program
                     {
                         app.csr = new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top };
                         if(Array.IndexOf(app.files, a) ==app.sellect)
-                            print("|->" + a + "<--\n",1);
+                            print("|=>" + a + "<=\n",1);
                         else
                             print("|-" + a + "\n");
                         Console.SetCursorPosition(app.csr.x, app.csr.y + 1);
@@ -159,6 +159,7 @@ class Program
             else
                 app.clear_cmd();
             sleep(20);
+            app.clear_cmd();
         }
     }
 
