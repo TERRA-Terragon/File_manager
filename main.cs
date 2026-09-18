@@ -1,11 +1,12 @@
 using System;
-using System.Globalization;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Runtime.CompilerServices;
-using System.IO.Pipes;
+using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.IO.Pipes;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 
 //namespace 
@@ -16,7 +17,12 @@ public struct pos_cursour
 }
 class Program
 {
-    string LOGO = @"00000000  0         
+    private string dir = @"1111          
+1  1111111111 
+1111111111111 
+1           1 
+1111111111111 ";
+    private string LOGO = @"00000000  0         
 000  0000 0         
 000   000 0         
 000  0000 0         
@@ -29,14 +35,16 @@ class Program
           0  0000000
           0  000    
           0  000    ";
+    private bool pressed_key;
     pos_cursour csr= new pos_cursour() { x = 0, y = 0 };
-    string[] files = null; //перечень всех файлов в дирректории ,которая открыта
-    public List<string> zapros = new List<string>(); //список по букве
-    public string sobraniy = ""; //результат  финальный после сборки по частям(путь)
-    public int last_y_pos = 0; //получение последней координаты по y(наиболее большой)
-    public int last_x_pos = 0; //получение последней координаты по x(наиболее большой)
-    public string selct=""; //текущая выбранная дирректория
-    public int sellect=0; //выбранная
+    private string[] files = null; //перечень всех файлов в дирректории ,которая открыта
+    private List<string> zapros = new List<string>(); //список по букве
+    private string sobraniy = ""; //результат  финальный после сборки по частям(путь)
+    private int last_y_pos = 0; //получение последней координаты по y(наиболее большой)
+    private int last_x_pos = 0; //получение последней координаты по x(наиболее большой)
+    private string selct=""; //текущая выбранная дирректория
+    private int sellect=0; //выбранная
+    private DateTime lastRamUpdate = DateTime.MinValue; //время для регистрации вызовов
 
     //methods
     //добавление пути
@@ -64,7 +72,7 @@ class Program
             app.zapros.Add(app.selct[i].ToString());
          }
     }
-    //возврат на 1 дирректорию вниз
+    //воаврат на 1 дирректорию вниз
     void back_to_path(Program app)
     {
         for (int i = app.zapros.Count()-1; i > 0; i--)
@@ -78,12 +86,20 @@ class Program
                 break;
         }
         app.get_folder(app.sobraniy, 1);
-        app.update();
+
     }
     //вывод в определённых координатах
-    void svitc_coursor_pos(pos_cursour a)
+    void switch_coursor_pos(pos_cursour a,pos_cursour b,string c)
     {
         Console.SetCursorPosition(a.x,a.y);
+        print(c);
+        Console.SetCursorPosition(b.x, b.y);
+    }
+    void switch_coursor_pos(pos_cursour a, pos_cursour b, string c,int g)
+    {
+        Console.SetCursorPosition(a.x, a.y);
+        print(c,g);
+        Console.SetCursorPosition(b.x, b.y);
     }
     //обновление запроса
     void update()
@@ -91,14 +107,15 @@ class Program
     //шаблон вывода текста
     static void print<T>(T a){Console.Write(a?.ToString()); }
     //шаблон вывода цветного текста
-    static void print<T>(T a,int b) {Console.ForegroundColor = ConsoleColor.Green; Console.Write(a?.ToString()); Console.ResetColor(); }
+    static void print<T>(T a,int b) { if (b == 1) Console.ForegroundColor = ConsoleColor.Green; else if (b ==2) Console.ForegroundColor = ConsoleColor.Red; Console.Write(a?.ToString()); Console.ResetColor(); }
     //очистка экран
-    void clear_cmd() {
-        for (int y = last_y_pos; y >= 0; y--)
+    void clear_cmd(Program app) {
+        for (int y = app.last_y_pos+1; y >= 0; y--)
         {
             Console.SetCursorPosition(0, y);
-            print(new string(' ', Console.WindowWidth - 1));   // ← Width, не Height!
+            print(new string(' ', Console.WindowWidth));   // ← Width, не Height!
         }
+        app.last_y_pos = 0;
 
     }
     //ожидание потока
@@ -126,85 +143,143 @@ class Program
         Program app = new Program();
         Console.SetWindowSize(200,60); //размер консоли
         Console.CursorVisible = false;
+
+
         //тело основного цикла
         while (true)
         {
-            //очистка экрана 9 полностью)
-            for (int y = app.last_y_pos; y >= 0; y--)
+            if (app.pressed_key == false)
             {
-                Console.SetCursorPosition(0, y);
-                print(new string(' ', Console.WindowWidth - 1));
-            }
-            //начало вывода 
-            Console.SetCursorPosition(0, 0);
-            print(app.LOGO + "\n");
-            foreach (string a in app.zapros) //вывод пути
-            {
-                print(""+a ,1);
-            }
-            ///////////////////////////////////////////////КНОПОЧКИ
-            if (Console.KeyAvailable)// нажатие клавиши
-            {
-                var key = Console.ReadKey(true);
-                if(key.Key == ConsoleKey.Enter)
-                { 
-                    //добавление по индексу
-
-                    app.zapros.Add(@"\");
-                    app.add_to_path(app);
-                    app.get_folder(app.sobraniy, 1);
-                    app.update();
-                    app.sellect= 0;
-                    ///прим енение папки
-                }
-                if (key.Key == ConsoleKey.Escape)
-                    break;
-                if (key.Modifiers == ConsoleModifiers.Control && key.Key == ConsoleKey.Backspace)
-                    app.back_to_path(app);
-                else if (key.Key == ConsoleKey.Backspace)
+                //очистка экрана 9 полностью)
+                for (int y = app.last_y_pos; y >= 0; y--)
                 {
-                    // Удаляем последний символ при нажатии Backspace
-                    if (app.zapros.Count > 0)
-                        app.zapros.RemoveAt(app.zapros.Count - 1);
-                    app.update();
+                    Console.SetCursorPosition(0, y);
+                    print(new string(' ', Console.WindowWidth - 1));
+                }
+                //начало вывода 
+                Console.SetCursorPosition(0, 0);
+                print(app.LOGO + "\n", 2);
+                app.switch_coursor_pos(new pos_cursour() { x = 22, y = 11 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, $"Process used RAM:   {Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0:F2} МБ");
+                //if ((DateTime.Now - app.lastRamUpdate).TotalMilliseconds > 1000)
+                //{
+                //    app.switch_coursor_pos(new pos_cursour() { x = 22, y = 11 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, $"Process used RAM:   {Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0:F2} МБ");
+                //    app.lastRamUpdate = DateTime.Now;
+                //}
 
-                }
 
-                else if (key.KeyChar >= 32) // 32 и выше - это печатные символы (буквы, цифры, пробел)
+
+                foreach (string a in app.zapros) //вывод пути
                 {
-                    app.zapros.Add(key.KeyChar.ToString());
-                    app.update();
+                    print("" + a, 1);
                 }
-                else
-                    if (app.files != null && key.Key == ConsoleKey.UpArrow && app.sellect > 0) //стрелочка вниз
+                ///////////////////////////////////////////////КНОПОЧКИ
+                if (Console.KeyAvailable)// нажатие клавиши
                 {
-                    app.sellect--;
-                }
-                else
-                    if (app.files != null && key.Key == ConsoleKey.DownArrow && app.sellect < (app.files.Length - 1)) //стрелочка вверх
-                    app.sellect++;
-            }
-            ///////////////////////////////////////////////ВЫВОД ВСЕХ ДИРРЕКТОРИЙ
-            if (!string.IsNullOrEmpty(app.sobraniy))
-            {
-                app.get_folder(app.sobraniy,1);
-                if (app.files.Length != 0)
-                    foreach (string a in app.files)
+                    app.pressed_key = true;
+                    var key = Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.Enter)
                     {
-                        app.csr = new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top };
-                        if(Array.IndexOf(app.files, a) ==app.sellect)
-                            print("  -|=>" + a + "<=\n",1);
-                        else
-                            print("   |-" + a + "\n");
-                        Console.SetCursorPosition(app.csr.x, app.csr.y + 1);
-                        if (app.last_y_pos < app.csr.y)
-                            app.last_y_pos = app.csr.y;
+                        //добавление по индексу
+
+                        app.zapros.Add(@"\");
+                        app.add_to_path(app);
+                        app.get_folder(app.sobraniy, 1);
+
+                        app.sellect = 0;
+                        ///прим енение папки
+                    }
+                    if (key.Key == ConsoleKey.Escape)
+                        break;
+                    if (key.Modifiers == ConsoleModifiers.Control && key.Key == ConsoleKey.Backspace)
+                        app.back_to_path(app);
+                    else if (key.Key == ConsoleKey.Backspace)
+                    {
+                        // Удаляем последний символ при нажатии Backspace
+                        if (app.zapros.Count > 0)
+                            app.zapros.RemoveAt(app.zapros.Count - 1);
+                        print(new string(' ', Console.WindowWidth - 1));
+                        app.clear_cmd(app);
+
+
                     }
 
+                    else if (key.KeyChar >= 32) // 32 и выше - это печатные символы (буквы, цифры, пробел)
+                    {
+                        app.zapros.Add(key.KeyChar.ToString());
+
+                    }
+                    else
+                        if (app.files != null && key.Key == ConsoleKey.UpArrow && app.sellect > 0) //стрелочка вниз
+                    {
+                        app.sellect--;
+
+                    }
+                    else
+                        if (app.files != null && key.Key == ConsoleKey.DownArrow && app.sellect < (app.files.Length - 1)) //стрелочка вверх
+                    {
+                        app.sellect++;
+                    }
+                    else
+                        if (app.files != null && key.Key == ConsoleKey.LeftArrow && app.sellect - 20 > 0) //стрелочка влево прыжок на 20
+                    {
+                        app.sellect= app.sellect-20;
+                    }
+                    else
+                        if (app.files != null && key.Key == ConsoleKey.RightArrow && app.sellect+20 <= (app.files.Length - 1)) //стрелочка вверх
+                    {
+                        app.sellect = app.sellect + 20;
+                    }
+                }
+                ///////////////////////////////////////////////ВЫВОД ВСЕХ ДИРРЕКТОРИЙ
+                if (!string.IsNullOrEmpty(app.sobraniy))
+                {
+                    app.get_folder(app.sobraniy, 1);
+                    if (app.files.Length != 0)
+                    {
+                        print("   -");
+                        short file_pass=0;
+                        short colum = 1;
+                        foreach (string a in app.files)
+                        {
+                            
+                            if (file_pass <= 20)
+                            {
+                                app.csr = new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }; //запоминаем есто курсора для сдел. вывода
+                            }
+                            else { 
+                                app.csr = new pos_cursour() { x = colum * 30, y = Console.GetCursorPosition().Top - 20 }; //запоминаем есто курсора для сдел. вывода
+                                print("|");
+                                colum++;
+                                file_pass = 0;
+                                }
+                            if (Array.IndexOf(app.files, a) == app.sellect)
+                                print("|-=>" + a + "<=\n", 1);
+                            else
+                            {
+                                print("|-" + a + "\n");
+                                if (file_pass == 20)
+                                {
+                                    Console.SetCursorPosition(Console.GetCursorPosition().Left, Console.GetCursorPosition().Top+1);
+                                    print(new string(' ',4 * colum * 30)+ "Page:" + colum);
+                                }
+                            }
+                            Console.SetCursorPosition(app.csr.x, app.csr.y + 1);
+                            if (app.last_y_pos < app.csr.y)
+                                app.last_y_pos = app.csr.y;
+                            if (app.last_x_pos < app.csr.x)
+                                app.last_x_pos = app.csr.x;
+                            file_pass++;
+
+                        }
+                    }
+
+                }
+                app.update();
             }
-            else
-                app.clear_cmd();
-            sleep(20);
+            sleep(22);
+            if (app.pressed_key == true) app.pressed_key = false;
+            app.clear_cmd(app);
+            app.last_y_pos = 0;
         }
     }
 
