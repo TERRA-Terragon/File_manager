@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -10,8 +11,8 @@ using System.Threading;
 using System.Xml.Serialization;
 
 
-//namespace 
-public struct pos_cursour
+/*namespace  System
+*/public struct pos_cursour
 {
     public int x;
     public int y;
@@ -56,13 +57,16 @@ class Program
     private int sellect=0; //выбранная
     private DateTime lastRamUpdate = DateTime.MinValue; //время для регистрации вызовов
 
-    //methods
+    ////
+    /////
+    /////                             METHODS
+    /////  
 
     void add_to_path(Program app)    //добавление пути
     {
         for (int x = 0; x < app.files.Length; x++)
         {
-            if (x == app.sellect)
+            if (x == app.sellect && app.sellect>=0)
             {
                 app.selct = app.files[x];
                 app.zapros.Clear();
@@ -107,20 +111,23 @@ class Program
     }
     void switch_coursor_pos_for(pos_cursour a, pos_cursour b, List<string> c,int AA)    //вывод в определённых координатах
     {
-        Console.SetCursorPosition(a.x+15, a.y);
-        print("Pins Folders:",1);
+        Console.SetCursorPosition(a.x+15, a.y-2);
+        print("Pins Folders:"+"["+pinFolders_list.Count()+ "/7]",1);c:
         short dlina=1; //сколько элементов(вниз)
         if(pinFolders_list.Count >= 1) //вывод всех закреплённых папок
             foreach(FolderPin Q in pinFolders_list)
             {
                 Console.SetCursorPosition(a.x + 15, a.y+ dlina);
-                print(Q.give_name(),3);
+                if(sellect != 1 && sellect !=2 && sellect != 3 && sellect != 4 && sellect != 5 && sellect != 6 && sellect != 7 && Math.Abs(sellect)== dlina)
+                    print("=>"+Q.give_name()+"<=", 1);
+                else
+                    print(Q.give_name(), 3);
                 dlina++;
             }
 
         for (int i = 0; i < AA; i++)
         {
-            Console.SetCursorPosition(a.x, a.y+i+1);
+            Console.SetCursorPosition(a.x+1, a.y-2+i+1);
             print(c[i],1);
         }
         Console.SetCursorPosition(b.x, b.y);
@@ -214,10 +221,20 @@ class Program
 
                     if (key.Key == ConsoleKey.Enter)                        ///прим енение папки
                     {
-                        app.zapros.Add(@"\");
-                        app.add_to_path(app);
-                        app.get_folder(app.sobraniy, 1);
-
+                        if (app.sellect >= 0)
+                        {
+                            app.zapros.Add(@"\");
+                            app.add_to_path(app);
+                            app.get_folder(app.sobraniy, 1);
+                        }
+                        else
+                        {
+                            app.zapros.Clear();
+                            for (int i = 0; i < app.pinFolders_list.Count; i++)
+                            {
+                                app.zapros.Add(app.pinFolders_list[i].give_path());
+                            }
+                        }
                         app.sellect = 0;
 
                     }
@@ -237,13 +254,15 @@ class Program
                     }
                     else if (app.files != null && key.KeyChar == '`') // пробел для ЗАКРЕПЛЕНИЕ папок         ///////////////////////////
                     {
-                        if (!app.pinFolders_list.Any(p => p.give_path() == app.sobraniy))
-                            app.pinFolders_list.Add(new FolderPin(app.sobraniy, app.sobraniy));
-                        else { 
-                        print("\nYou can't pin this fodler",2);
-                        sleep(1000);
+                        if (!app.pinFolders_list.Any(p => p.give_path() == app.sobraniy) && app.pinFolders_list.Count < 8) {
+                            app.pinFolders_list.Add(new FolderPin(app.sobraniy, app.sobraniy)); }
+                        else
+                        {
+                            app.pinFolders_list.RemoveAll(p => p.give_path() == app.sobraniy);
+                            print("\nYou can't pin this fodler! Folder was unbound.", 2);
+                            sleep(1000);
+                        }
                     }
-                }
                 else if (key.KeyChar >= 32 && key.KeyChar != '`') // 32 и выше - это печатные символы (буквы, цифры, пробел)
                 {
                     app.zapros.Add(key.KeyChar.ToString());
@@ -252,7 +271,7 @@ class Program
 
 
                 else
-                    if (app.files != null && key.Key == ConsoleKey.UpArrow && app.sellect > 0) //стрелочка вниз
+                    if (app.files != null && key.Key == ConsoleKey.UpArrow && app.sellect > -app.pinFolders_list.Count()) //стрелочка вниз
                 {
                     app.sellect--;
 
@@ -294,7 +313,7 @@ class Program
                                 colum++;
                                 file_pass = 0;
                                 }
-                            if (Array.IndexOf(app.files, a) == app.sellect)
+                            if (Array.IndexOf(app.files, a) == app.sellect && app.sellect>=0)
                             {
                                 print("|-=>" + a + "<=\n", 1);
                                 if (file_pass == 20)
