@@ -116,7 +116,15 @@ class Program
             print(new string(' ', Console.WindowWidth));   // ← Width, не Height!
         }
         app.last_y_pos = 0;
-
+    }
+    void clear_cmd_all_screen(Program app)
+    {
+        for (int y = Console.WindowHeight-1; y >= 0; y--)
+        {
+            Console.SetCursorPosition(0, y);
+            print(new string(' ', Console.WindowWidth));   // ← Width, не Height!
+        }
+        app.last_y_pos = 0;
     }
     //ожидание потока
     static void sleep(int seconds) {Thread.Sleep(seconds);}
@@ -160,11 +168,7 @@ class Program
                 Console.SetCursorPosition(0, 0);
                 print(app.LOGO + "\n", 2);
                 app.switch_coursor_pos(new pos_cursour() { x = 22, y = 11 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, $"Process used RAM:   {Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0:F2} МБ");
-                //if ((DateTime.Now - app.lastRamUpdate).TotalMilliseconds > 1000)
-                //{
-                //    app.switch_coursor_pos(new pos_cursour() { x = 22, y = 11 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, $"Process used RAM:   {Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0:F2} МБ");
-                //    app.lastRamUpdate = DateTime.Now;
-                //}
+
 
 
 
@@ -248,7 +252,6 @@ class Program
                             }
                             else { 
                                 app.csr = new pos_cursour() { x = colum * 30, y = Console.GetCursorPosition().Top - 20 }; //запоминаем есто курсора для сдел. вывода
-                                print("|");
                                 colum++;
                                 file_pass = 0;
                                 }
@@ -259,13 +262,13 @@ class Program
                                 print("|-" + a + "\n");
                                 if (file_pass == 20)
                                 {
-                                    Console.SetCursorPosition(Console.GetCursorPosition().Left, Console.GetCursorPosition().Top+1);
-                                    print(new string(' ',4 * colum * 30)+ "Page:" + colum);
+                                    Console.SetCursorPosition(Console.GetCursorPosition().Left + ((colum-1) * 30)+8, Console.GetCursorPosition().Top+1);
+                                    print("Page:" + colum);
                                 }
                             }
                             Console.SetCursorPosition(app.csr.x, app.csr.y + 1);
-                            if (app.last_y_pos < app.csr.y)
-                                app.last_y_pos = app.csr.y;
+                            if (app.last_y_pos < app.csr.y+1)
+                                app.last_y_pos = app.csr.y+1;
                             if (app.last_x_pos < app.csr.x)
                                 app.last_x_pos = app.csr.x;
                             file_pass++;
@@ -278,8 +281,18 @@ class Program
             }
             sleep(22);
             if (app.pressed_key == true) app.pressed_key = false;
-            app.clear_cmd(app);
-            app.last_y_pos = 0;
+
+            if ((DateTime.Now - app.lastRamUpdate).TotalMilliseconds > 1000)
+            {
+                app.clear_cmd_all_screen(app);
+                //    app.switch_coursor_pos(new pos_cursour() { x = 22, y = 11 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, $"Process used RAM:   {Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0:F2} МБ");
+                app.lastRamUpdate = DateTime.Now;
+            }
+            else
+            {
+                app.clear_cmd(app);
+                app.last_y_pos = 0;
+            }
         }
     }
 
