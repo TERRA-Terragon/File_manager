@@ -16,6 +16,19 @@ public struct pos_cursour
 }
 class Program
 {
+    string LOGO = @"00000000  0         
+000  0000 0         
+000   000 0         
+000  0000 0         
+0000000   0         
+          0         
+00000000000000000000
+          0         
+          0  0000000
+          0  000    
+          0  0000000
+          0  000    
+          0  000    ";
     pos_cursour csr= new pos_cursour() { x = 0, y = 0 };
     string[] files = null;
     public List<string> zapros = new List<string>();
@@ -25,9 +38,46 @@ class Program
     public int last_x_pos = 0;
     public string selct="";
     public int sellect=0;
-    private bool press_enter;
 
     //methods
+    void add_to_path(Program app)
+    {
+        for (int x = 0; x < app.files.Length; x++)
+        {
+            if (x == app.sellect)
+            {
+                app.selct = app.files[x];
+                app.zapros.Clear();
+                for (int i = 0; i < app.selct.Length; i++)
+                {
+                    app.zapros.Add(app.selct[i].ToString());
+                }
+            }
+        }
+    }
+    void add_to_path(Program app,string b)
+    {
+         app.zapros.Clear();
+         for (int i = 0; i < b.Length; i++)
+         {
+            app.zapros.Add(app.selct[i].ToString());
+         }
+    }
+    void back_to_path(Program app)
+    {
+        for (int i = app.zapros.Count()-1; i > 0; i--)
+        {
+            if (app.zapros[i].ToString() != @"\")
+                app.zapros.RemoveAt(app.zapros.Count - 1);
+            else
+            if(app.zapros[app.zapros.Count() - 1].ToString() != @"\")
+                app.zapros.RemoveAt(app.zapros.Count - 1);
+            else
+                break;
+        }
+        app.get_folder(app.sobraniy, 1);
+        app.update();
+    }
     void svitc_coursor_pos(pos_cursour a)
     {
         Console.SetCursorPosition(a.x,a.y);
@@ -78,30 +128,21 @@ class Program
             }
 
             Console.SetCursorPosition(0, 0);
-            print("Файловый менеджер С#:\n");
+            print(app.LOGO + "\n");
             foreach (string a in app.zapros)
             {
-                print(""+a);
+                print(""+a ,1);
             }
-            print(new string(' ', 5));//подтираем лишнее
+            ///////////////////////////////////////////////КНОПОЧКИ
             if (Console.KeyAvailable)// нажатие клавиши
             {
                 var key = Console.ReadKey(true);
                 if(key.Key == ConsoleKey.Enter)
                 { 
-                   for (int x = 0; x < app.files.Length; x++)
-                    {
-                        if (x == app.sellect)
-                        {
-                            app.selct = app.files[x];
-                            app.zapros.Clear();
-                            for(int i=0; i<app.selct.Length;i++)
-                            {
-                                app.zapros.Add(app.selct[i].ToString());
-                            }
-                        }
-                    }
+                    //добавление по индексу
+
                     app.zapros.Add(@"\");
+                    app.add_to_path(app);
                     app.get_folder(app.sobraniy, 1);
                     app.update();
                     app.sellect= 0;
@@ -109,7 +150,9 @@ class Program
                 }
                 if (key.Key == ConsoleKey.Escape)
                     break;
-                if (key.Key == ConsoleKey.Backspace)
+                if (key.Modifiers == ConsoleModifiers.Control && key.Key == ConsoleKey.Backspace)
+                    app.back_to_path(app);
+                else if (key.Key == ConsoleKey.Backspace)
                 {
                     // Удаляем последний символ при нажатии Backspace
                     if (app.zapros.Count > 0)
@@ -117,13 +160,6 @@ class Program
                     app.update();
 
                 }
-                else
-                if (key.Modifiers == ConsoleModifiers.Control && key.Key == ConsoleKey.Backspace)
-                    for(int i = app.selct.Length; i>0;i--)
-                    {
-                        if(app.selct[i].ToString() == @"\");
-                            break;
-                    }
 
                 else if (key.KeyChar >= 32) // 32 и выше - это печатные символы (буквы, цифры, пробел)
                 {
@@ -136,9 +172,10 @@ class Program
                     app.sellect--;
                 }
                 else
-                    if (app.files!=null && key.Key == ConsoleKey.DownArrow && app.sellect < (app.files.Length-1))
+                    if (app.files != null && key.Key == ConsoleKey.DownArrow && app.sellect < (app.files.Length - 1))
                     app.sellect++;
             }
+            ///////////////////////////////////////////////КНОПОЧКИ
             if (!string.IsNullOrEmpty(app.sobraniy))
             {
                 app.get_folder(app.sobraniy,1);
