@@ -56,6 +56,7 @@ class Program
     private string selct=""; //текущая выбранная дирректория
     private int sellect=0; //выбранная
     private DateTime lastRamUpdate = DateTime.MinValue; //время для регистрации вызовов
+    private bool mode_search = false; //рыжим просмотра папком и файлов true -файлы , else - папки
 
     ////
     /////
@@ -225,7 +226,7 @@ class Program
                         {
                             app.zapros.Add(@"\");
                             app.add_to_path(app);
-                            app.get_folder(app.sobraniy, 1);
+                            app.get_folder(app.sobraniy, Convert.ToInt16(app.mode_search));
                         }
                         else
                         {
@@ -236,6 +237,14 @@ class Program
                             }
                         }
                         app.sellect = 0;
+
+                    }
+                    else
+                        if (key.Key == ConsoleKey.Tab)                        ///прим енение папки
+                    {
+                        app.mode_search= !app.mode_search;
+                       // print(Convert.ToInt16( app.mode_search));
+                        //app.get_folder(app.sobraniy, Convert.ToInt16(app.mode_search));
 
                     }
                     if (key.Key == ConsoleKey.Escape)                            //выход
