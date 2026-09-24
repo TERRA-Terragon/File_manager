@@ -85,83 +85,78 @@ class Program
           0  0000000
           0  000    
           0  000    ";
-    private static Dictionary<string, string> list_command = new Dictionary<string, string>
+    private static Dictionary<string, Action<string[]>> list_command = new Dictionary<string, Action<string[]>> //доступные команды 
 {
-    { "help",         "file - создание файла, files_search - поиск файла, dir - создание папки, dir_search - поиск папки, open - открытие файла, cd - попасть в каталог, move - перемещение файла, copy - копирование, rm - удалить" },
-    { "file",         "" },
-    { "files_search", "" },
-    { "dir",          "" },
-    { "dir_search",   "" },
-    { "open",         "" },
-    { "cd",           "" },
-    { "move",         "" },
-    { "copy",         "" },
-    { "rm",           "" }
+    { "help" ,args => print("file - создание файла, files_search - поиск файла, dir - создание папки, dir_search - поиск папки, open - открытие файла, cd - попасть в каталог, move - перемещение файла, copy - копирование, rm - удалить",0)},
+    { "file", args => {open_file(args[0]);
+    }},
+    { "files_search",args => print("files_search",3) },
+    { "dir",         args => print("dir",3) },
+    { "dir_search",  args => print("dir_search",3) },
+    { "open",        args => print("open",3)},
+    { "cd",          args =>{ move_to(args[0],args[1]);}},
+    { "move",        args => print("move",3) },
+    { "copy",        args => print("copy",3)},
+    { "rm",          args => print("rm",3) },
+    {"exit", args => Environment.Exit(0) }
 };
-    public enum commands{
-        file,// создание файла 
-        files_search, //поиск файла
-        dir, // создание папки
-        dir_search, // поиск паки 
-        open, // открытие файла
-        cd, //попасть в коталог
-        move, // перемещение файла
-        copy, // копирвоание
-        rm // удалить
+    static void open_file(string path)// открытие файла
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                print($"Open file:{path}");
+                FileInfo file = new FileInfo(path);
+                file.Open(FileMode.Open);
+            }
+        }
+        catch { print("\nEror open file", 2); }
+    }//////////////////////////////////////////////////////////////
+    static void move_to(string path, string path_To)// перемещение файла
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(path) && string.IsNullOrEmpty(path_To))
+            {
+                print($"Moved {path} to :{path_To}");
+                FileInfo file = new FileInfo(path);
+                file.MoveTo(path_To);
+            }
+        }
+        catch { print("Eror", 2); }
     }
-    void add_To_Serch(ref string a)
+    static void cd(Program app, string path)// перемещение файла
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                print($"You change Directory :{path}");
+                app.zapros.Clear();
+                app.add_To_Serch(ref path);
+            }
+        }
+        catch { print("Eror", 2); }
+    }
+    //public enum commands{
+    //    file,// создание файла 
+    //    files_search, //поиск файла
+    //    dir, // создание папки
+    //    dir_search, // поиск паки 
+    //    open, // открытие файла
+    //    cd, //попасть в коталог
+    //    move, // перемещение файла
+    //    copy, // копирвоание
+    //    rm // удалить
+    //}
+    void add_To_Serch(ref string a) // добавить к текуюему щапросу
     {
         for (int i = 0; i < dir.Count; i++)
         {
             zapros.Add(dir[i]);
         }
     }
-    public class command //основной класс для определение команд
-    {
-        private static string command_name;
-        private static commands cmd;
-
-        command(commands cmd)
-        {
-            {
-                command_name = cmd.ToString();
-            }
-            static void open_file(string path, commands cm)// открытие файла
-            {
-                try
-                {
-                    if (cm == commands.open && string.IsNullOrEmpty(path))
-                    { 
-                        print($"Open file:{path}");
-                        FileInfo file = new FileInfo(path);
-                        file.Open(FileMode.Open);
-                    }}catch{print("Eror", 2);}}//////////////////////////////////////////////////////////////
-            static void move_to(string path, string path_To, commands cm)// перемещение файла
-            {
-                try
-                {
-                    if (cm == commands.move && string.IsNullOrEmpty(path) && string.IsNullOrEmpty(path_To))
-                    { 
-                        print($"Moved {path} to :{path_To}");
-                        FileInfo file = new FileInfo(path);
-                        file.MoveTo(path_To);
-                    }}catch{print("Eror", 2);}}
-            static void cd(Program app,string path, commands cm)// перемещение файла
-            {
-                try
-                {
-                    if (cm == commands.cd && string.IsNullOrEmpty(path))
-                    {
-                        print($"You change Directory :{path}");
-                        app.zapros.Clear();
-                        app.add_To_Serch(ref path);
-                    }
-                }
-                catch { print("Eror", 2); }
-            }
-
-        }
-    } 
     public class FolderPin
     
     {
