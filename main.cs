@@ -85,7 +85,7 @@ class Program
           0  0000000
           0  000    
           0  000    ";
-    private static Dictionary<string, Action<string[]>> list_command = new Dictionary<string, Action<string[]>> //доступные команды 
+    public static Dictionary<string, Action<string[]>> list_command = new Dictionary<string, Action<string[]>> //доступные команды 
 {
     { "help" ,args => print("file - создание файла, files_search - поиск файла, dir - создание папки, dir_search - поиск папки, open - открытие файла, cd - попасть в каталог, move - перемещение файла, copy - копирование, rm - удалить",0)},
     { "file", args => {open_file(args[0]);
@@ -446,6 +446,11 @@ class Program
                 ///////////////////////////////////////////////ВЫВОД ВСЕХ ДИРРЕКТОРИЙ
                 if (!string.IsNullOrEmpty(app.sobraniy))
                 {
+                    if (app.sobraniy.Contains("|help")) // Обработка команд!!! ///////////////////////
+                        foreach (char s in app.sobraniy.ToString()) {                                        //Substring                                        
+                            //list_command-[s.ToString()]( new[] { app.sobraniy });
+                            print(list_command["help"].ToString() + " ", 1);
+                        }
                     app.get_folder(app.sobraniy, 1);
                     if (app.files.Length != 0)
                     {
