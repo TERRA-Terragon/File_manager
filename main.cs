@@ -31,7 +31,7 @@ class Program
 @"==---:  .#%%.%=:::=-=-=--=-=-====--.: :.-:::      -+@#@*@@@@+@+@=@.-.== ========-======-===-====-===--- @ -:==-===-====.@ =-=======-==== ",
 @"====-  ##@+@:%*++:=:+=+=====-=--::-.. :      @@@@@@@@@@@@@@@@@@@%+..-@#.+-:-==-=-+=====-========-====-@-= ====-========-=.=-+======-==== ",
 @"---   %%=#-%:%+*+-+:=-=---.: ..-::- @@@@@%         -%#%%@@%%#@%@@=-.**-:=-:--=-=-=-====-=-====--==---**:--=-==-=-=-====-+-=-=--===---=== ",
-@"-:: @##++#=%:%++#+%=+:-..: - #.----:@@@@@@@%=@+           @@@#*%+=-%@=-:=:===+==-+========+==-===+-=-=::===-======-====+=-=-+==+=-=-==== ",
+@"-:: @##++#=%:%++#+%=+:-..: - #.----:@@@@@@@%=@+               @@@#*%+=-%@=-:=:===+==-+========+==-===+-=-=::===-======-====+=-=-+==+=-=-==== ",
 @": .*%*%**#=%:%+#*+#:-.:..: @-%:====@@@@@@@@@@===             @@+ -.*@-+.=:====-=-=-======-==--==-=::#.-==-=-==-=-=-===++--=-==-==---==== ",
 @". %+#=#+=*-%.#=**=- -. =*%##  :=:=@%@%%%%%@@%@@@#**+*  +@@%.     :**@.=:=:=--=-=-=--===-===--=--.. :*:=-=-====-=-=-=---==-=-=--==----=== ",
 @"::@+%+%#*#+%:%*#*-=.: *%@@%@=---=+@%@%%%%%%%@@@@#@#*#:@@@@@@#@ ..: =*.=:=:================--=-.- *++ -===-========-=============-------- ",
@@ -59,9 +59,9 @@ class Program
 @"%%%%%%%@@@-#:=++##@ ..+-+#...:  +@@%@#@%%#%%%%%%%%%%@%@%%%*#*%+**%#%#%%%%%%%%%%%%%%%@@@@@@-    ::====-=======---==-====-==========:#:==- ",
 @"#%%%%%%%#@@+.=:==:%=-  :-:**++.   %+#*@#@%%%%%%%%%%%%%%%%%%%*#*###%%%%%%%%%%%%%%%%%%@@@%@    .:-====--=---==----==---=--=:=-=--=-+.*-=-- ",
 @"%%%%%%%%%@@@-*-+#+@*# .::..:-=-:. .%@@@*@@%%%%%%%%%%%%%%%%%@%@@@%%%%%%%%%%%%%%%@@@@@@.    .:-======-========-=--==---===+==-+==+:+.% --. ",
-@"%%%%%%%%%%#@*==++-@*%= .:--------:  *#@*@@@@%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@     .:--==--=--=-=----==----=+==-::==-=-+--+-+.*.:.   ",
+@"%%%%%%%%%%#@*==++-@*%= .:--------:  *#@*@@@@%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@     .:--==--=--=-=----==----=+==-::==-=-+--+-+.*.:.  ",
 @"%%%%%%%%%%#@#*+==:#=%+=  :--====--:   %+@%#@@%%%%%%%%%%%%%%%%%%%%%%%%%@%@@@@@@@%++  . .:-=----==---=-=----------=:-=:+-:=-=-=--=-+.+..+* ",
-@"@%%%%%%%%%%@@@+*#=%*@*@   .-===--=-:.  +@@@@@@@@%%%%%%%%%@%@@@@@@@@@@@@@@@@*. :=.*-+..-=--=-----=-------=:----=+=--=:*==+==-+=+@#@.=.+%   ",
+@"@%%%%%%%%%%@@@+*#=%*@*@   .-===--=-:.  +@@@@@@@@%%%%%%%%%@%@@@@@@@@@@@@@@@@*. :=.*-+..-=--=-----=-------=:----=+=--=:*==+==-+=+@#@.=.+%  ",
 @"%#%%%%%%%%%@#@-++-#=#=@**:  .:-===---:   *%@*@@@@@@@@%@@@@@@@@@@@@@@@%*        . *== ..:-::-=::::::----====-=-====-=:=--+:=:-:-+=#.+#*.. ",
 @"%%%%%%%%%%#@%@#+*:+-*-@%@#+.   :--==-=:.   %+%=@@@@@@@@@@@@@+=:= -. .   .   :.:+.*++-++===+-==-+=+==----==---===-=-=-==-=-===--+=#:-.-:- ",
 @"%%%%%%%%%%%%%@@*#+%+%*@#@@@@+*    .--=--:.      .@@@@@           :  : ..-:=-==-+:#**===-+=+=+=:-=+-=::======-=====-=-======-===*+#-::=-- ",
@@ -85,9 +85,10 @@ class Program
           0  0000000
           0  000    
           0  000    ";
+    private List<string> all_commands = new List<string>() { "help", "file", "files_search", "dir", "dir_search", "open", "cd", "move", "copy", "rm", "exit" };
     public static Dictionary<string, Action<string[]>> list_command = new Dictionary<string, Action<string[]>> //доступные команды 
 {
-    { "help" ,args => print("file - создание файла, files_search - поиск файла, dir - создание папки, dir_search - поиск папки, open - открытие файла, cd - попасть в каталог, move - перемещение файла, copy - копирование, rm - удалить",0)},
+    { "help" ,args => print("\n file - создание файла\n files_search - поиск файла\n dir - создание папки\n dir_search - поиск папки\n open - открытие файла\n cd - попасть в каталог\n move - перемещение файла\n copy - копирование\n rm - удалить",0)},
     { "file", args => {open_file(args[0]);
     }},
     { "files_search",args => print("files_search",3) },
@@ -150,18 +151,22 @@ class Program
     //    copy, // копирвоание
     //    rm // удалить
     //}
-    void add_To_Serch(ref string a) // добавить к текуюему щапросу
+    void add_To_Serch(ref string a) // добавить к текуюему запросу
     {
         for (int i = 0; i < dir.Count; i++)
         {
             zapros.Add(dir[i]);
         }
     }
+    //public class cpmmands_handler()
+    //{
+
+    //}
     public class FolderPin
     
     {
-        private string name;
-        private string path;
+        private string name; // имя закреплённой папки
+        private string path; //путь к закреплённой папке
         public string give_path() { return path; }
         public string give_name() { return name; }
         public FolderPin(string path_,string name_) { name = name_; path = path_; }
@@ -183,7 +188,16 @@ class Program
     /////
     /////                             METHODS
     /////  
-
+    void command_handler()
+    {
+        if (sobraniy.Contains("|")) {
+            for (int i = 0; i < sobraniy.Length; i++)
+            {
+                //if ()
+            }
+        }
+            
+    }
     void add_to_path(Program app)    //добавление пути
     {
         for (int x = 0; x < app.files.Length; x++)
@@ -236,17 +250,7 @@ class Program
             if (folders_pin)
             {
             Console.SetCursorPosition(a.x + 15, a.y - 2);
-            switch (app.mode_search)
-            {
-                case true:
-                    {
-                        print($"Pins Folders:[{pinFolders_list.Count()}/7] Search Mode:File", 1);
-                        break;
-                    }
-                case false:
-                    print($"Pins Folders:[{pinFolders_list.Count()}/7] Search Mode:Directory", 1);
-                    break;
-            }
+            print($"Pins Folders:[{pinFolders_list.Count()}/7]",1); // закреплёныне папки  
             }
                 short dlina =1; //сколько элементов(вниз)
         if(pinFolders_list.Count >= 1 && folders_pin) //вывод всех закреплённых папок
@@ -325,8 +329,8 @@ class Program
         Console.SetCursorPosition((Console.WindowWidth-1)/3, 1);
         
         //print(app.vermail,4); ///красота
-        app.switch_coursor_pos_for(app, new pos_cursour() { x = (Console.GetCursorPosition().Left / 2), y = 2 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, app.vermail, app.vermail.Count(),false,4);
-        sleep(4000);
+        //app.switch_coursor_pos_for(app, new pos_cursour() { x = (Console.GetCursorPosition().Left / 2), y = 2 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, app.vermail, app.vermail.Count(),false,4);
+        //sleep(4000);
         Console.Clear();
         Console.SetWindowSize(200, 50);
         ////// не имеет смысла
@@ -346,7 +350,17 @@ class Program
                 Console.SetCursorPosition(0, 0);
                 print(app.LOGO + "\n", 2);
                 app.switch_coursor_pos(new pos_cursour() { x = 22, y = 11 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, $"Process used RAM:   {Process.GetCurrentProcess().WorkingSet64 / 1024.0 / 1024.0:F2} МБ");
-
+                switch (app.mode_search)
+                {
+                    case true:
+                        {
+                            app.switch_coursor_pos(new pos_cursour() { x = 22, y = 12 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, $"Search Mode(Tab - for switch):File");
+                            break;
+                        }
+                    case false:
+                        app.switch_coursor_pos(new pos_cursour() { x = 22, y = 12 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, @"Search Mode(Tab - for switch):Directory");
+                        break;
+                }
                 app.switch_coursor_pos_for(app,new pos_cursour() { x = 23, y = 2 }, new pos_cursour() { x = Console.GetCursorPosition().Left, y = Console.GetCursorPosition().Top }, app.dir, app.dir.Count(),true,1);
 
 
@@ -364,11 +378,13 @@ class Program
 
                     if (key.Key == ConsoleKey.Enter)                        ///прим енение папки
                     {
-                        if (app.sellect >= 0)
+                        if (app.sellect >= 0)                //при выборе не закреплённых папок
                         {
-                            app.zapros.Add(@"\");
-                            app.add_to_path(app);
+                            if (app.mode_search)
+                                app.zapros.Add(@"\");
                             app.get_folder(app.sobraniy, Convert.ToInt16(app.mode_search));
+                            app.get_folder(app.sobraniy, Convert.ToInt16(app.mode_search));
+                                app.add_to_path(app);
                         }
                         else
                         {
@@ -405,13 +421,13 @@ class Program
                     }
                     else if (app.files != null && key.KeyChar == '`') // пробел для ЗАКРЕПЛЕНИЕ папок         ///////////////////////////
                     {
-                        if (!app.pinFolders_list.Any(p => p.give_path() == app.sobraniy) && app.pinFolders_list.Count < 8) {
+                        if (!app.pinFolders_list.Any(p => p.give_path() == app.sobraniy) && app.pinFolders_list.Count < 7) {
                             app.pinFolders_list.Add(new FolderPin(app.sobraniy, app.sobraniy)); }
                         else
                         {
                             app.pinFolders_list.RemoveAll(p => p.give_path() == app.sobraniy);
                             print("\nYou can't pin this fodler! Folder was unbound.", 2);
-                            sleep(1000);
+                            sleep(500);
                         }
                     }
                 else if (key.KeyChar >= 32 && key.KeyChar != '`') // 32 и выше - это печатные символы (буквы, цифры, пробел)
@@ -446,12 +462,23 @@ class Program
                 ///////////////////////////////////////////////ВЫВОД ВСЕХ ДИРРЕКТОРИЙ
                 if (!string.IsNullOrEmpty(app.sobraniy))
                 {
-                    if (app.sobraniy.Contains("|help")) // Обработка команд!!! ///////////////////////
-                        foreach (char s in app.sobraniy.ToString()) {                                        //Substring                                        
-                            //list_command-[s.ToString()]( new[] { app.sobraniy });
-                            print(list_command["help"].ToString() + " ", 1);
-                        }
-                    app.get_folder(app.sobraniy, 1);
+                    if ((DateTime.Now - app.lastRamUpdate).TotalMilliseconds > 500)
+                    {//вывод курсора
+                        print("█", 2);
+                    } else 
+                        print(" ");
+                    //foreac  ///комманды
+                    if (app.sobraniy.Contains("|help"))
+                    {// Обработка команд!!! ///////////////////////
+                     //foreach (char s in app.sobraniy.ToString()) {                                        //Substring                                        
+                     //list_command-[s.ToString()]( new[] { app.sobraniy });
+                        list_command["help"](Array.Empty<string>());
+                        //print(" "  + list_command["help"].ToString(), 1);
+                        //print(app.all_commands[0], 1);
+                        //}
+                    }
+                    else
+                        app.get_folder(app.sobraniy, Convert.ToInt16(app.mode_search));
                     if (app.files.Length != 0)
                     {
                         print("   -");
