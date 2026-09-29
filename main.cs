@@ -467,18 +467,24 @@ class Program
                         print("█", 2);
                     } else 
                         print(" ");
-                    //foreac  ///комманды
-                    if (app.sobraniy.Contains("|help"))
-                    {// Обработка команд!!! ///////////////////////
-                     //foreach (char s in app.sobraniy.ToString()) {                                        //Substring                                        
-                     //list_command-[s.ToString()]( new[] { app.sobraniy });
-                        list_command["help"](Array.Empty<string>());
-                        //print(" "  + list_command["help"].ToString(), 1);
-                        //print(app.all_commands[0], 1);
-                        //}
-                    }
-                    else
-                        app.get_folder(app.sobraniy, Convert.ToInt16(app.mode_search));
+                    ///комманды ///////////////////////////////////
+                    foreach (string command in app.all_commands) {
+                        if (app.sobraniy.Contains(@"|{}"))
+                        {
+
+                            for (int i = 0; i < app.sobraniy.Length; i++)
+                            {// Обработка команд!!! ///////////////////////
+                             //foreach (char s in app.sobraniy.ToString()) {                                        //Substring                                        
+                             //list_command-[s.ToString()]( new[] { app.sobraniy });
+                                list_command["help"](Array.Empty<string>());
+                                //print(" "  + list_command["help"].ToString(), 1);
+                                //print(app.all_commands[0], 1);
+                                //}
+                            }
+                        }
+                        else
+                            app.get_folder(app.sobraniy, Convert.ToInt16(app.mode_search));
+                                    }
                     if (app.files.Length != 0)
                     {
                         print("   -");
