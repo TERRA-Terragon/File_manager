@@ -1,0 +1,1 @@
+This is an attempt to organize a standard file manager in C# in the console for convenient file management. So far, the functionality is limited to: opening paths, displaying the contents of paths, and a search mode (without parameters) for folders and files.
